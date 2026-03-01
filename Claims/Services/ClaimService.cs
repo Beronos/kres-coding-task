@@ -26,13 +26,13 @@ namespace Claims.Services
 
             claim.Id = Guid.NewGuid().ToString();
             await _claimRepository.AddAsync(claim);
-            _auditer.AuditClaim(claim.Id, "POST");
+            await _auditer.AuditClaimAsync(claim.Id, "POST");
             return claim;
         }
 
         public async Task DeleteClaimAsync(string id)
         {
-            _auditer.AuditClaim(id, "DELETE");
+            await _auditer.AuditClaimAsync(id, "DELETE");
             await _claimRepository.DeleteAsync(id);
         }
 

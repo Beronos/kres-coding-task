@@ -1,3 +1,4 @@
+using Azure.Messaging.ServiceBus;
 using Claims.Auditing;
 using Claims.Data;
 using Claims.Repositories;
@@ -48,6 +49,9 @@ builder.Services.AddDbContext<ClaimsContext>(options =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddSingleton(
+    new ServiceBusClient(builder.Configuration["ServiceBus:ConnectionString"]));
 
 builder.Services.AddScoped<IAuditRepository, AuditRepository>();
 builder.Services.AddScoped<IAuditer, Auditer>();

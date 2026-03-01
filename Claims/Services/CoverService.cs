@@ -54,13 +54,13 @@ namespace Claims.Services
             cover.Id = Guid.NewGuid().ToString();
             cover.Premium = ComputePremium(cover.StartDate, cover.EndDate, cover.Type);
             await _coverRepository.AddAsync(cover);
-            _auditer.AuditCover(cover.Id, "POST");
+            await _auditer.AuditCoverAsync(cover.Id, "POST");
             return cover;
         }
 
         public async Task DeleteCoverAsync(string id)
         {
-            _auditer.AuditCover(id, "DELETE");
+            await _auditer.AuditCoverAsync(id, "DELETE");
             await _coverRepository.DeleteAsync(id);
         }
 
