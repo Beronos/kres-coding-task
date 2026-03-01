@@ -44,7 +44,7 @@ public class CoversController : ControllerBase
         try
         {
             await _coverService.CreateCoverAsync(cover);
-            return Ok(cover);
+            return CreatedAtAction(nameof(GetAsync), new { id = cover.Id }, cover);
         }
         catch (Exception ex)
         {

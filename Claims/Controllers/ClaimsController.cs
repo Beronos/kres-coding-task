@@ -30,7 +30,7 @@ namespace Claims.Controllers
             try
             {
                 await _claimService.CreateClaimAsync(claim);
-                return Ok(claim);
+                return CreatedAtAction(nameof(GetAsync), new { id = claim.Id }, claim);
             }
             catch (Exception ex)
             {
