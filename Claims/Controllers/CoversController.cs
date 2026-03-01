@@ -32,6 +32,7 @@ public class CoversController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [ActionName("GetById")]
     public async Task<ActionResult<Cover>> GetAsync(string id)
     {
         var result = await _coverService.GetCoverAsync(id);
@@ -44,7 +45,7 @@ public class CoversController : ControllerBase
         try
         {
             await _coverService.CreateCoverAsync(cover);
-            return CreatedAtAction(nameof(GetAsync), new { id = cover.Id }, cover);
+            return CreatedAtAction("GetById", new { id = cover.Id }, cover);
         }
         catch (Exception ex)
         {

@@ -25,12 +25,13 @@ namespace Claims.Controllers
         }
 
         [HttpPost]
+        [ActionName("GetById")]
         public async Task<ActionResult> CreateAsync(Claim claim)
         {
             try
             {
                 await _claimService.CreateClaimAsync(claim);
-                return CreatedAtAction(nameof(GetAsync), new { id = claim.Id }, claim);
+                return CreatedAtAction("GetById", new { id = claim.Id }, claim);
             }
             catch (Exception ex)
             {
