@@ -74,4 +74,44 @@ public class CoverServiceTests
         await _auditer.Received(1).AuditCoverAsync("id-1", "DELETE");
         await _coverRepo.Received(1).DeleteAsync("id-1");
     }
+
+    [Fact]
+    public void ComputePremium_Yacht_30Days()
+    {
+        var start = new DateTime(2026, 1, 1);
+        var end = start.AddDays(30);
+
+        var premium = _coverService.ComputePremium(start, end, CoverType.Yacht);
+
+        // 30 days × (1250 × 1.1) = 41 250
+        Assert.Equal(41_250m, premium);
+    }
+
+    [Fact]
+    public void ComputePremium_ContainerShip_30Days()
+    {
+        var start = new DateTime(2026, 1, 1);
+        var end = start.AddDays(30);
+
+        var premium = _coverService.ComputePremium(start, end, CoverType.ContainerShip);
+
+        // 30 days × (1250 × 1.3) = 41 250
+        Assert.Equal(48_750m, premium);
+    }
+
+    [Fact]
+    public void ComputePremium_Tanker_200Days_AllThreeBands()
+    {
+        var start = new DateTime(2026, 1, 1);
+        var end = start.AddDays(200);
+
+        var premium = _coverService.ComputePremium(start, end, CoverType.Tanker);
+
+        // premiumPerDay = 1250 × 1.5 = 1875
+        // first bracket:  30  × 1875        =  56 250
+        // second bracket: 150 × 1875 × 0.98 = 275 625
+        // third bracket:   20 × 1875 × 0.97 =  36 375
+        //                               = 368 250
+        Assert.Equal(368_250m, premium);
+    }
 }

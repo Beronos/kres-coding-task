@@ -15,36 +15,28 @@ namespace Claims.Services
 
         public decimal ComputePremium(DateTime startDate, DateTime endDate, CoverType coverType)
         {
-            var multiplier = 1.3m;
-            if (coverType == CoverType.Yacht)
+            const decimal BaseDayRate = 1250;
+
+            var premiumPerDay = coverType switch
             {
-                multiplier = 1.1m;
-            }
+                CoverType.Yacht => BaseDayRate * 1.1m,
+                CoverType.PassengerShip => BaseDayRate * 1.2m,
+                CoverType.Tanker => BaseDayRate * 1.5m,
+                _ => BaseDayRate * 1.3m
+            };
 
-            if (coverType == CoverType.PassengerShip)
-            {
-                multiplier = 1.2m;
-            }
+            var totalDays = (int)(endDate - startDate).TotalDays;
 
-            if (coverType == CoverType.Tanker)
-            {
-                multiplier = 1.5m;
-            }
+            var firstBracketNrOfDays = Math.Min(totalDays, 30);
+            var secondBracketNrOfDays = Math.Max(0, Math.Min(totalDays - 30, 150));
+            var thirdBracketNrOfDays = Math.Max(0, totalDays - 180);
 
-            var premiumPerDay = 1250 * multiplier;
-            var insuranceLength = (endDate - startDate).TotalDays;
-            var totalPremium = 0m;
+            var secondBracketMultiplier = coverType == CoverType.Yacht ? 0.95m : 0.98m;
+            var thirdBracketMultiplier  = coverType == CoverType.Yacht ? 0.92m : 0.97m;
 
-            for (var i = 0; i < insuranceLength; i++)
-            {
-                if (i < 30) totalPremium += premiumPerDay;
-                if (i < 180 && coverType == CoverType.Yacht) totalPremium += premiumPerDay - premiumPerDay * 0.05m;
-                else if (i < 180) totalPremium += premiumPerDay - premiumPerDay * 0.02m;
-                if (i < 365 && coverType != CoverType.Yacht) totalPremium += premiumPerDay - premiumPerDay * 0.03m;
-                else if (i < 365) totalPremium += premiumPerDay - premiumPerDay * 0.08m;
-            }
-
-            return totalPremium;
+            return premiumPerDay * firstBracketNrOfDays
+                 + premiumPerDay * secondBracketNrOfDays * secondBracketMultiplier
+                 + premiumPerDay * thirdBracketNrOfDays * thirdBracketMultiplier;
         }
 
         public async Task<Cover> CreateCoverAsync(Cover cover)
