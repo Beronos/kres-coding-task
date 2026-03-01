@@ -1,12 +1,13 @@
 ﻿using Claims.Repositories;
+using Claims.Validators;
 
 namespace Claims.Services
 {
     public class CoverService : ICoverService
-    {   
+    {
         private readonly ICoverRepository _coverRepository;
         private readonly IAuditer _auditer;
-        public CoverService(ICoverRepository coverReposity, IAuditer auditer) 
+        public CoverService(ICoverRepository coverReposity, IAuditer auditer)
         {
             _coverRepository = coverReposity;
             _auditer = auditer;
@@ -48,6 +49,8 @@ namespace Claims.Services
 
         public async Task<Cover> CreateCoverAsync(Cover cover)
         {
+            CoverValidator.Validate(cover);
+
             cover.Id = Guid.NewGuid().ToString();
             cover.Premium = ComputePremium(cover.StartDate, cover.EndDate, cover.Type);
             await _coverRepository.AddAsync(cover);

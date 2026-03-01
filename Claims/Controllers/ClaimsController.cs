@@ -1,3 +1,4 @@
+using Claims.Exceptions;
 using Claims.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,8 +27,20 @@ namespace Claims.Controllers
         [HttpPost]
         public async Task<ActionResult> CreateAsync(Claim claim)
         {
-            await _claimService.CreateClaimAsync(claim);
-            return Ok(claim);
+            try
+            {
+                await _claimService.CreateClaimAsync(claim);
+                return Ok(claim);
+            }
+            catch (Exception ex)
+            {
+                return ex switch
+                {
+                    NotFoundException => NotFound(ex.Message),
+                    ValidationException => BadRequest(ex.Message),
+                    _ => StatusCode(500, ex.Message)
+                };
+            }
         }
 
         [HttpDelete("{id}")]

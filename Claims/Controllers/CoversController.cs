@@ -1,3 +1,4 @@
+using Claims.Exceptions;
 using Claims.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -40,8 +41,19 @@ public class CoversController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> CreateAsync(Cover cover)
     {
-        await _coverService.CreateCoverAsync(cover);
-        return Ok(cover);
+        try
+        {
+            await _coverService.CreateCoverAsync(cover);
+            return Ok(cover);
+        }
+        catch (Exception ex)
+        {
+            return ex switch
+            {
+                ValidationException => BadRequest(ex.Message),
+                _ => StatusCode(500, ex.Message)
+            };
+        }
     }
 
     [HttpDelete("{id}")]
